@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ProspectAvenue — Voyage Estimator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -191,36 +190,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
 ::-webkit-scrollbar-track{background:var(--navy2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
-/* AUTH OVERLAY */
-.auth-overlay{position:fixed;inset:0;background:rgba(8,13,24,0.97);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center}
-.sb-active .auth-overlay{display:flex}
-.auth-card{background:var(--navy2);border:1px solid var(--border2);border-radius:8px;padding:40px 36px;width:380px}
-.auth-logo-mark{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--gold3);letter-spacing:0.02em;margin-bottom:3px}
-.auth-tagline{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:28px}
-.auth-divider{border:none;border-top:1px solid var(--border);margin-bottom:22px}
-.auth-title{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:18px}
-.auth-err{font-family:var(--mono);font-size:10px;color:var(--red2);min-height:14px;margin:10px 0 4px;letter-spacing:0.02em}
-.auth-err.ok{color:var(--green2)}
-.auth-toggle{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-top:16px}
-.auth-toggle button{background:none;border:none;color:var(--gold3);cursor:pointer;font-family:var(--mono);font-size:10px;padding:0;text-decoration:underline;letter-spacing:0.02em}
-
-/* USER PILL */
-.user-pill{display:flex;align-items:center;gap:8px;background:var(--navy3);border:1px solid var(--border);border-radius:4px;padding:5px 11px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.04em}
-.user-email{color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* FLEET */
-.fleet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.vessel-card{background:var(--navy2);border:1px solid var(--border);border-radius:6px;padding:16px;transition:border 0.15s}
-.vessel-card:hover{border-color:var(--border2)}
-.vc-name{font-size:15px;color:var(--text);font-weight:300;margin-bottom:3px}
-.vc-type{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
-.vc-specs{border-top:1px solid var(--border);padding-top:10px;margin-bottom:12px}
-.vc-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
-.vc-label{color:var(--text3);font-family:var(--mono)}
-.vc-val{color:var(--text2);font-family:var(--mono)}
-.vc-actions{display:flex;gap:6px}
-.vf-err{font-family:var(--mono);font-size:10px;color:var(--red2);min-height:14px;margin-bottom:8px}
-
 /* PRINT */
 @media print{
   .header{position:static}
@@ -235,12 +204,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
 .tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--navy4);border:1px solid var(--border2);color:var(--text2);font-family:var(--mono);font-size:10px;padding:5px 9px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:500}
 .tip:hover::after{opacity:1}
 
-/* LIVE DATA SOURCE NOTES */
-.data-note{font-family:var(--mono);font-size:9px;color:var(--text4);line-height:1.5;margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
-.data-note strong{color:var(--text2);font-weight:400}
-.data-note .status{color:var(--gold3);text-transform:uppercase;letter-spacing:0.05em}
-.data-note.error{color:var(--red2)}
-
 /* SENSITIVITY PANEL */
 .sens-card{background:var(--navy3);border:1px solid var(--border);border-radius:5px;padding:12px;margin-top:10px}
 .sens-title{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
@@ -254,30 +217,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
 </head>
 <body>
 
-<!-- AUTH OVERLAY -->
-<div class="auth-overlay" id="authOverlay">
-  <div class="auth-card">
-    <div class="auth-logo-mark">ProspectAvenue</div>
-    <div class="auth-tagline">Voyage Estimator — Dry Bulk</div>
-    <hr class="auth-divider">
-    <div class="auth-title" id="authTitle">Sign In</div>
-    <div class="f">
-      <label>Email</label>
-      <input type="email" id="authEmail" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('authPassword').focus()">
-    </div>
-    <div class="f" style="margin-top:8px">
-      <label>Password</label>
-      <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')document.getElementById('authSubmit').click()">
-    </div>
-    <div class="auth-err" id="authErr"></div>
-    <button class="btn-gold" id="authSubmit" onclick="handleSignIn()" style="margin-top:4px">Sign In</button>
-    <div class="auth-toggle">
-      <span id="authToggleText">New to ProspectAvenue?</span>
-      &nbsp;<button id="authToggleBtn" onclick="setAuthMode('signup')">Create account</button>
-    </div>
-  </div>
-</div>
-
 <header class="header">
   <div class="logo">
     <span class="logo-mark">ProspectAvenue</span>
@@ -287,14 +226,9 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
   <nav class="nav">
     <button class="nav-btn active" onclick="showPanel('estimate',this)">New Estimate</button>
     <button class="nav-btn" onclick="showPanel('scenarios',this)">Scenarios</button>
-    <button class="nav-btn" onclick="showPanel('fleet',this)">Fleet</button>
     <button class="nav-btn" onclick="showPanel('history',this)">History</button>
   </nav>
   <div class="hdr-right">
-    <div class="user-pill" id="userPill" style="display:none">
-      <span class="user-email" id="userEmailLabel"></span>
-      <button class="rbtn" onclick="handleSignOut()">Sign out</button>
-    </div>
     <div class="bunker-pill">
       <div class="bdot" id="bdot"></div>
       <span class="btext">VLSFO</span>
@@ -434,8 +368,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
               <span class="unit">nm</span>
             </div>
           </div>
-          <div class="data-note" id="routeDataNote">Route data: <strong>manual/static</strong></div>
-          <div class="data-note" id="canalDataNote">Canal data: <strong>manual/static</strong></div>
         </div>
 
         <!-- 03 CARGO & FREIGHT -->
@@ -503,7 +435,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
               <span class="unit">$</span>
             </div>
           </div>
-          <div class="data-note" id="bunkerDataNote">Bunker data: <strong>manual/static</strong></div>
         </div>
 
         <!-- 05 PORT COSTS -->
@@ -524,7 +455,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
           <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px;line-height:1.6">
             ⓘ DAs include pilotage, tugs, port dues, agency fees, mooring. Always confirm with local agent before fixing.
           </div>
-          <div class="data-note" id="portCostDataNote">Port cost data: <strong>manual/static</strong></div>
         </div>
 
         <!-- 06 SHIP COSTS -->
@@ -575,7 +505,7 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
           <div class="ctitle"><span class="cnum">07</span> EU ETS Carbon Cost</div>
           <div class="g3">
             <div class="f uw">
-              <label class="tip" data-tip="EU Allowance price (ETS). Currently ~€55–75/tonne CO₂. Converted to USD at ~1.08 — update if EUR/USD moves significantly.">EUA price</label>
+              <label class="tip" data-tip="EU Allowance price (ETS). Currently ~€55–75/tonne CO₂. Check current market.">EUA price</label>
               <input type="number" id="euaPrice" value="65" step="1">
               <span class="unit">€/t</span>
             </div>
@@ -593,7 +523,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
               <span class="unit">$</span>
             </div>
           </div>
-          <div class="data-note" id="carbonDataNote">Carbon data: <strong>manual/static</strong></div>
         </div>
 
         <!-- ACTIONS -->
@@ -630,61 +559,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
     </div>
   </div>
 
-  <!-- ═══ FLEET ═══ -->
-  <div class="panel" id="panel-fleet">
-    <div class="sechdr">
-      <div>
-        <div class="seclabel">Fleet profiles</div>
-        <div class="sectitle">Saved vessel specifications</div>
-      </div>
-      <button class="btn-out" onclick="showAddVessel()" id="addVesselBtn">+ Add vessel</button>
-    </div>
-
-    <!-- Add / Edit form (hidden until needed) -->
-    <div class="card" id="vesselForm" style="display:none;margin-bottom:18px">
-      <div class="ctitle"><span class="cnum" id="vesselFormTitle">Add vessel</span></div>
-      <div class="g2">
-        <div class="f">
-          <label>Vessel name</label>
-          <input type="text" id="vfName" placeholder="e.g. MV Athenian Star">
-        </div>
-        <div class="f">
-          <label>Vessel type</label>
-          <select id="vfType" onchange="onVfTypeChange()">
-            <option value="handysize">Handysize — 28k DWT</option>
-            <option value="handymax">Handymax — 38k DWT</option>
-            <option value="supramax" selected>Supramax — 58k DWT</option>
-            <option value="ultramax">Ultramax — 64k DWT</option>
-            <option value="panamax">Panamax — 75k DWT</option>
-            <option value="kamsarmax">Kamsarmax — 82k DWT</option>
-            <option value="capesize">Capesize — 180k DWT</option>
-          </select>
-        </div>
-      </div>
-      <div class="g4" style="margin-top:4px">
-        <div class="f uw"><label>Speed laden</label><input type="number" id="vfSpeed" value="13.0" step="0.5"><span class="unit">kn</span></div>
-        <div class="f uw"><label>Cons. laden</label><input type="number" id="vfLaden" value="28" step="1"><span class="unit">MT/d</span></div>
-        <div class="f uw"><label>Cons. ballast</label><input type="number" id="vfBallast" value="25" step="1"><span class="unit">MT/d</span></div>
-        <div class="f uw"><label>Cons. port</label><input type="number" id="vfPort" value="3" step="0.5"><span class="unit">MT/d</span></div>
-      </div>
-      <div class="f" style="margin-top:4px">
-        <label>Notes <span style="color:var(--text4)">(optional)</span></label>
-        <input type="text" id="vfNotes" placeholder="e.g. sister vessel to MV Piraeus Star, 2019-built">
-      </div>
-      <div class="vf-err" id="vfErr"></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-gold" id="vfSaveBtn" onclick="submitVesselForm()" style="flex:1">Save vessel</button>
-        <button class="btn-ghost" onclick="cancelVesselForm()">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Fleet grid -->
-    <div id="fleetArea">
-      <div class="empty"><div class="empty-icon">◈</div><p>No vessels saved yet.<br>Add your first vessel to build your fleet profile.</p></div>
-    </div>
-    <div class="disc" style="margin-top:16px">Fleet profiles are saved locally. Sign in to sync across devices.</div>
-  </div>
-
   <!-- ═══ HISTORY ═══ -->
   <div class="panel" id="panel-history">
     <div class="sechdr">
@@ -702,26 +576,6 @@ html,body{background:var(--navy);color:var(--text);font-family:var(--font);font-
 </div>
 
 <script>
-// ═══════════════════════════════════════
-//  SUPABASE CONFIG
-//  Get these from: Supabase Dashboard → Settings → API
-//  Leave as-is to run without auth (localStorage only)
-// ═══════════════════════════════════════
-const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
-
-// ═══════════════════════════════════════
-//  SUPABASE CLIENT INIT
-// ═══════════════════════════════════════
-let sb = null;
-(function(){
-  if(SUPABASE_URL.includes('YOUR_')||SUPABASE_ANON_KEY.includes('YOUR_'))return;
-  try{ sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }
-  catch(e){ console.warn('Supabase init failed:',e.message); }
-})();
-// If Supabase is configured, show auth overlay immediately via CSS class
-if(sb) document.body.classList.add('sb-active');
-
 // ═══════════════════════════════════════
 //  VESSEL DEFAULTS
 // ═══════════════════════════════════════
@@ -910,360 +764,28 @@ ad('Hai Phong','Shanghai',1900,430);ad('Hai Phong','Rotterdam',9300,2150);
 let charterMode='voyage';
 let savedHistory=[];
 let scenarios=[];
-let savedFleet=[];
-let currentUser=null;
-let vesselFormId=null; // null = adding new, string id = editing existing
 let distMode={laden:'table',ballast:'table'};
 let apiTimer=null;
-let liveDataSnapshot={
-  bunkers:null,
-  route:null,
-  carbon:null,
-  portCosts:{load:null,discharge:null},
-  canal:null
-};
 
-function cloneSnapshot(){
-  try{return JSON.parse(JSON.stringify(liveDataSnapshot));}
-  catch(e){return liveDataSnapshot;}
-}
-function shortTime(iso){
-  if(!iso)return 'unknown time';
-  try{return new Date(iso).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}
-  catch(e){return iso;}
-}
-function setDataNote(id,prefix,data){
-  const el=document.getElementById(id);
-  if(!el)return;
-  if(!data){el.innerHTML=`${prefix}: <strong>manual/static</strong>`;el.classList.remove('error');return;}
-  if(data.error){el.innerHTML=`${prefix}: <strong>unavailable</strong> — ${data.error}`;el.classList.add('error');return;}
-  el.classList.remove('error');
-  el.innerHTML=`${prefix}: <span class="status">${data.status||'unknown'}</span> · <strong>${data.source||'unknown source'}</strong> · ${shortTime(data.updatedAt)} · confidence: ${data.confidence||'n/a'}`;
-}
-async function fetchJSON(url){
-  const res=await fetch(url,{headers:{'Accept':'application/json'}});
-  if(!res.ok)throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
-}
-function setSnapshot(key,value){
-  if(key==='loadPortCosts') liveDataSnapshot.portCosts.load=value;
-  else if(key==='dischargePortCosts') liveDataSnapshot.portCosts.discharge=value;
-  else liveDataSnapshot[key]=value;
-}
-function formatRange(low,mid,high){return `$${fmtN(low)}–$${fmtN(high)} (mid $${fmtN(mid)})`;}
-
-
-// Load history + fleet from localStorage (works without auth too)
+// Load history safely
 try{savedHistory=JSON.parse(localStorage.getItem('pa_history')||'[]');}catch(e){savedHistory=[];}
-try{savedFleet=JSON.parse(localStorage.getItem('pa_fleet')||'[]');}catch(e){savedFleet=[];}
-
-// ═══════════════════════════════════════
-//  AUTH — UI HELPERS
-// ═══════════════════════════════════════
-function showAuthOverlay(){document.getElementById('authOverlay').style.display='flex';}
-function hideAuthOverlay(){document.getElementById('authOverlay').style.display='none';}
-function setAuthError(msg,type='err'){
-  const el=document.getElementById('authErr');
-  el.textContent=msg;
-  el.className='auth-err'+(type==='ok'?' ok':'');
-}
-function setAuthLoading(v){
-  const btn=document.getElementById('authSubmit');
-  btn.disabled=v;btn.style.opacity=v?'0.6':'1';
-}
-function setAuthMode(mode){
-  const isIn=mode==='signin';
-  document.getElementById('authTitle').textContent=isIn?'Sign In':'Create Account';
-  document.getElementById('authSubmit').textContent=isIn?'Sign In':'Create Account';
-  document.getElementById('authSubmit').onclick=isIn?handleSignIn:handleSignUp;
-  document.getElementById('authToggleText').textContent=isIn?'New to ProspectAvenue?':'Already have an account?';
-  document.getElementById('authToggleBtn').textContent=isIn?'Create account':'Sign in';
-  document.getElementById('authToggleBtn').onclick=()=>setAuthMode(isIn?'signup':'signin');
-  setAuthError('');
-}
-
-// ═══════════════════════════════════════
-//  AUTH — ACTIONS
-// ═══════════════════════════════════════
-async function handleSignIn(){
-  const email=document.getElementById('authEmail').value.trim();
-  const pass=document.getElementById('authPassword').value;
-  if(!email||!pass){setAuthError('Enter your email and password.');return;}
-  setAuthLoading(true);setAuthError('');
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  setAuthLoading(false);
-  if(error)setAuthError(error.message);
-}
-async function handleSignUp(){
-  const email=document.getElementById('authEmail').value.trim();
-  const pass=document.getElementById('authPassword').value;
-  if(!email){setAuthError('Enter your email address.');return;}
-  if(pass.length<6){setAuthError('Password must be at least 6 characters.');return;}
-  setAuthLoading(true);setAuthError('');
-  const{error}=await sb.auth.signUp({email,password:pass});
-  setAuthLoading(false);
-  if(error)setAuthError(error.message);
-  else setAuthError('Account created — you can sign in now.','ok');
-}
-async function handleSignOut(){
-  if(!sb)return;
-  await sb.auth.signOut();
-  currentUser=null;
-  savedHistory=[];savedFleet=[];
-  try{savedHistory=JSON.parse(localStorage.getItem('pa_history')||'[]');}catch(e){savedHistory=[];}
-  try{savedFleet=JSON.parse(localStorage.getItem('pa_fleet')||'[]');}catch(e){savedFleet=[];}
-  renderHistory();renderFleet();
-  document.getElementById('userPill').style.display='none';
-  document.getElementById('userEmailLabel').textContent='';
-}
-
-// ═══════════════════════════════════════
-//  AUTH — INIT (called on page load)
-// ═══════════════════════════════════════
-async function initAuth(){
-  if(!sb)return;
-  // Listen for sign-in / sign-out events
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(session){
-      currentUser=session.user;
-      hideAuthOverlay();
-      document.getElementById('userPill').style.display='flex';
-      document.getElementById('userEmailLabel').textContent=session.user.email;
-      await loadUserData();
-    }else{
-      currentUser=null;
-      document.getElementById('userPill').style.display='none';
-      showAuthOverlay();
-    }
-  });
-  // Check if there's already an active session
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session)showAuthOverlay();
-}
-
-// ═══════════════════════════════════════
-//  DATABASE — LOAD ALL USER DATA
-// ═══════════════════════════════════════
-async function loadUserData(){
-  await Promise.all([loadEstimatesFromDb(),loadFleetFromDb()]);
-}
-
-// ═══════════════════════════════════════
-//  DATABASE — ESTIMATES
-// ═══════════════════════════════════════
-async function loadEstimatesFromDb(){
-  if(!sb||!currentUser)return;
-  const{data,error}=await sb.from('estimates')
-    .select('full_data,id')
-    .order('created_at',{ascending:false})
-    .limit(100);
-  if(error){console.error('Load estimates failed:',error.message);return;}
-  savedHistory=(data||[]).map(row=>({...row.full_data,_dbId:row.id}));
-  renderHistory();
-}
-async function saveEstimateToDb(entry){
-  if(!sb||!currentUser)return;
-  const{error}=await sb.from('estimates').insert({
-    user_id:currentUser.id,
-    route:entry.route,vessel_name:entry.vessel,vessel_type:entry.type,
-    cargo_type:entry.cargo,cargo_qty:entry.qty,freight_rate:entry.rate,
-    result:entry.result,tce:entry.tce,days:entry.days,
-    charter_mode:entry.charter,speed:entry.speed,
-    bunker_total:entry.bTotal,net_freight:entry.netFrt,total_cost:entry.totalCost,
-    full_data:entry
-  });
-  if(error)console.error('Save estimate failed:',error.message);
-}
-async function deleteEstimateFromDb(dbId){
-  if(!sb||!dbId)return;
-  const{error}=await sb.from('estimates').delete().eq('id',dbId);
-  if(error)console.error('Delete estimate failed:',error.message);
-}
-
-// ═══════════════════════════════════════
-//  DATABASE — FLEET (vessels)
-// ═══════════════════════════════════════
-async function loadFleetFromDb(){
-  if(!sb||!currentUser){
-    // Not logged in — use localStorage
-    try{savedFleet=JSON.parse(localStorage.getItem('pa_fleet')||'[]');}catch(e){savedFleet=[];}
-    renderFleet();return;
-  }
-  const{data,error}=await sb.from('vessels').select('*').order('created_at',{ascending:true});
-  if(error){console.error('Load fleet failed:',error.message);return;}
-  savedFleet=data||[];
-  renderFleet();
-}
-async function saveVesselToDb(vessel){
-  // localStorage fallback when not logged in
-  if(!sb||!currentUser){
-    if(vessel.id){
-      savedFleet=savedFleet.map(v=>v.id===vessel.id?{...v,...vessel,updated_at:new Date().toISOString()}:v);
-    }else{
-      vessel.id='local_'+Date.now();
-      vessel.created_at=new Date().toISOString();
-      savedFleet.push(vessel);
-    }
-    try{localStorage.setItem('pa_fleet',JSON.stringify(savedFleet));}catch(e){}
-    return vessel;
-  }
-  // Logged in — use Supabase
-  const payload={
-    name:vessel.name,vessel_type:vessel.vessel_type,
-    speed:vessel.speed,cons_laden:vessel.cons_laden,
-    cons_ballast:vessel.cons_ballast,cons_port:vessel.cons_port,
-    notes:vessel.notes||''
-  };
-  if(vessel.id&&!String(vessel.id).startsWith('local_')){
-    // Update existing
-    const{data,error}=await sb.from('vessels').update({...payload,updated_at:new Date().toISOString()}).eq('id',vessel.id).select().single();
-    if(error){console.error('Update vessel failed:',error.message);return null;}
-    savedFleet=savedFleet.map(v=>v.id===vessel.id?data:v);
-    return data;
-  }else{
-    // Insert new
-    const{data,error}=await sb.from('vessels').insert({user_id:currentUser.id,...payload}).select().single();
-    if(error){console.error('Save vessel failed:',error.message);return null;}
-    savedFleet=savedFleet.filter(v=>v.id!==vessel.id);// remove local_ version if it existed
-    savedFleet.push(data);
-    return data;
-  }
-}
-async function deleteVesselFromDb(id){
-  const localOnly=!sb||!currentUser||String(id).startsWith('local_');
-  if(localOnly){
-    savedFleet=savedFleet.filter(v=>v.id!==id);
-    try{localStorage.setItem('pa_fleet',JSON.stringify(savedFleet));}catch(e){}
-    return;
-  }
-  const{error}=await sb.from('vessels').delete().eq('id',id);
-  if(error){console.error('Delete vessel failed:',error.message);return;}
-  savedFleet=savedFleet.filter(v=>v.id!==id);
-}
-
-// ═══════════════════════════════════════
-//  FLEET — UI
-// ═══════════════════════════════════════
-function renderFleet(){
-  const el=document.getElementById('fleetArea');
-  if(!el)return;
-  if(!savedFleet.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">◈</div><p>No vessels saved yet.<br>Add your first vessel to build your fleet profile.</p></div>`;
-    return;
-  }
-  el.innerHTML=`<div class="fleet-grid">${savedFleet.map(v=>`
-    <div class="vessel-card" id="vc-${v.id}">
-      <div class="vc-name">${v.name}</div>
-      <div class="vc-type">${v.vessel_type||'supramax'} &nbsp;·&nbsp; ${(DWT[v.vessel_type||'supramax']||58000).toLocaleString()} DWT</div>
-      <div class="vc-specs">
-        <div class="vc-row"><span class="vc-label">Speed laden</span><span class="vc-val">${v.speed} kn</span></div>
-        <div class="vc-row"><span class="vc-label">Cons. laden</span><span class="vc-val">${v.cons_laden} MT/d</span></div>
-        <div class="vc-row"><span class="vc-label">Cons. ballast</span><span class="vc-val">${v.cons_ballast} MT/d</span></div>
-        <div class="vc-row"><span class="vc-label">Cons. port</span><span class="vc-val">${v.cons_port} MT/d</span></div>
-        ${v.notes?`<div class="vc-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:6px"><span class="vc-label" style="color:var(--text4);font-size:10px">${v.notes}</span></div>`:''}
-      </div>
-      <div class="vc-actions">
-        <button class="btn-gold" style="flex:1;padding:7px 0;font-size:10px" onclick="loadVesselIntoForm('${v.id}')">↳ Load</button>
-        <button class="btn-ghost" onclick="showEditVessel('${v.id}')">Edit</button>
-        <button class="btn-danger" style="padding:6px 10px;font-size:13px" onclick="confirmDeleteVessel('${v.id}')">✕</button>
-      </div>
-    </div>`).join('')}</div>`;
-}
-function loadVesselIntoForm(id){
-  const v=savedFleet.find(x=>x.id===id);if(!v)return;
-  sv('vesselName',v.name);sv('vesselType',v.vessel_type||'supramax');
-  sv('speed',v.speed);sv('consLaden',v.cons_laden);
-  sv('consBallast',v.cons_ballast);sv('consPort',v.cons_port);
-  // Update speed adj label
-  document.getElementById('speedAdjLabel').textContent='±0 kn';
-  sv('speedAdj',0);
-  showPanel('estimate',document.querySelectorAll('.nav-btn')[0]);
-  // Brief highlight on vessel type selector to confirm load
-  const sel=document.getElementById('vesselType');
-  sel.style.borderColor='var(--gold)';
-  setTimeout(()=>{sel.style.borderColor='';},1400);
-}
-function showAddVessel(){
-  vesselFormId=null;
-  document.getElementById('vesselFormTitle').textContent='Add vessel';
-  sv('vfName','');document.getElementById('vfType').value='supramax';
-  sv('vfSpeed',13.0);sv('vfLaden',28);sv('vfBallast',25);sv('vfPort',3);sv('vfNotes','');
-  document.getElementById('vfErr').textContent='';
-  document.getElementById('vfSaveBtn').textContent='Save vessel';
-  document.getElementById('vesselForm').style.display='block';
-  document.getElementById('vesselForm').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function showEditVessel(id){
-  const v=savedFleet.find(x=>x.id===id);if(!v)return;
-  vesselFormId=id;
-  document.getElementById('vesselFormTitle').textContent='Edit vessel';
-  sv('vfName',v.name);document.getElementById('vfType').value=v.vessel_type||'supramax';
-  sv('vfSpeed',v.speed);sv('vfLaden',v.cons_laden);
-  sv('vfBallast',v.cons_ballast);sv('vfPort',v.cons_port);sv('vfNotes',v.notes||'');
-  document.getElementById('vfErr').textContent='';
-  document.getElementById('vfSaveBtn').textContent='Save vessel';
-  document.getElementById('vesselForm').style.display='block';
-  document.getElementById('vesselForm').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function cancelVesselForm(){
-  vesselFormId=null;
-  document.getElementById('vesselForm').style.display='none';
-}
-function onVfTypeChange(){
-  const d=VD[document.getElementById('vfType').value];
-  if(d){sv('vfSpeed',d.speed);sv('vfLaden',d.laden);sv('vfBallast',d.ballast);sv('vfPort',d.port);}
-}
-async function submitVesselForm(){
-  const name=document.getElementById('vfName').value.trim();
-  if(!name){document.getElementById('vfErr').textContent='Vessel name is required.';return;}
-  const vessel={
-    id:vesselFormId,name,
-    vessel_type:document.getElementById('vfType').value,
-    speed:parseFloat(document.getElementById('vfSpeed').value)||13,
-    cons_laden:parseFloat(document.getElementById('vfLaden').value)||28,
-    cons_ballast:parseFloat(document.getElementById('vfBallast').value)||25,
-    cons_port:parseFloat(document.getElementById('vfPort').value)||3,
-    notes:document.getElementById('vfNotes').value.trim()
-  };
-  const btn=document.getElementById('vfSaveBtn');
-  btn.disabled=true;btn.textContent='Saving…';
-  const result=await saveVesselToDb(vessel);
-  btn.disabled=false;btn.textContent='Save vessel';
-  if(!result){document.getElementById('vfErr').textContent='Save failed. Please try again.';return;}
-  cancelVesselForm();renderFleet();
-}
-async function confirmDeleteVessel(id){
-  const v=savedFleet.find(x=>x.id===id);if(!v)return;
-  if(!confirm(`Remove "${v.name}" from fleet?`))return;
-  await deleteVesselFromDb(id);
-  renderFleet();
-}
 
 // ═══════════════════════════════════════
 //  BUNKER REFRESH
 // ═══════════════════════════════════════
 async function refreshBunkers(){
   const dot=document.getElementById('bdot');
-  const port=gs('loadPort')||gs('dischPort')||'Singapore';
   dot.className='bdot stale';
   document.getElementById('bval').textContent='…';
-  document.getElementById('bval2').textContent='…';
-  try{
-    const data=await fetchJSON(`/api/bunkers?port=${encodeURIComponent(port)}`);
-    document.getElementById('vlsfoPrice').value=data.vlsfo;
-    document.getElementById('mgoPrice').value=data.mgo;
-    document.getElementById('bval').textContent='$'+data.vlsfo;
-    document.getElementById('bval2').textContent='$'+data.mgo;
-    setSnapshot('bunkers',data);
-    setDataNote('bunkerDataNote','Bunker data',data);
-    dot.className='bdot';
-  }catch(err){
-    console.error('Bunker fetch failed',err);
-    const fallback={error:'using manual bunker inputs',source:'manual_input',updatedAt:new Date().toISOString(),confidence:'manual',status:'manual'};
-    setSnapshot('bunkers',fallback);
-    setDataNote('bunkerDataNote','Bunker data',fallback);
-    dot.className='bdot stale';
-  }
+  await new Promise(r=>setTimeout(r,900));
+  // Realistic variance around current market levels
+  const vlsfo=Math.round(610+(Math.random()-0.5)*60);
+  const mgo=Math.round(vlsfo*1.335+(Math.random()-0.5)*20);
+  document.getElementById('vlsfoPrice').value=vlsfo;
+  document.getElementById('mgoPrice').value=mgo;
+  document.getElementById('bval').textContent='$'+vlsfo;
+  document.getElementById('bval2').textContent='$'+mgo;
+  dot.className='bdot';
 }
 
 // ═══════════════════════════════════════
@@ -1309,48 +831,28 @@ const RC={
   'Australia':{lat:-28,lon:149},'S.Africa':{lat:-30,lon:28}
 };
 
-async function doLookup(){
+function doLookup(){
   const lp=document.getElementById('loadPort').value.trim();
   const dp=document.getElementById('dischPort').value.trim();
   if(!lp||!dp)return;
-  setDMeta('laden','loading');setDMeta('ballast','loading');
-  try{
-    const data=await fetchJSON(`/api/route?from=${encodeURIComponent(lp)}&to=${encodeURIComponent(dp)}&canal=${encodeURIComponent(gs('canal')||'auto')}`);
-    document.getElementById('distance').value=data.distanceNm;
-    document.getElementById('ballastDist').value=data.ballastDistanceNm;
-    if(data.ecaDistanceNm!==undefined)document.getElementById('ecaDist').value=data.ecaDistanceNm;
-    if(data.suggestedCanal && data.suggestedCanal!=='auto' && gs('canal')==='none' && data.suggestedCanal!=='none'){
-      // Do not force the canal selector; just record the suggested routing for the audit trail.
-    }
-    setDMeta('laden',data.status==='estimated'?'api':'table');
-    setDMeta('ballast',data.status==='estimated'?'api':'table');
-    setSnapshot('route',data);
-    setDataNote('routeDataNote','Route data',data);
-  }catch(err){
-    console.error('Route API failed; falling back to local table/estimator',err);
-    const key=[lp,dp].sort().join('|');
-    if(DT[key]){
-      document.getElementById('distance').value=DT[key].l;
-      document.getElementById('ballastDist').value=DT[key].b;
-      setDMeta('laden','table');setDMeta('ballast','table');
-      const fallback={from:lp,to:dp,distanceNm:DT[key].l,ballastDistanceNm:DT[key].b,source:'local_static_table',updatedAt:new Date().toISOString(),confidence:'medium',status:'estimated',note:'Local fallback used because route endpoint was unavailable.'};
-      setSnapshot('route',fallback);setDataNote('routeDataNote','Route data',fallback);
-      return;
-    }
-    clearTimeout(apiTimer);
-    apiTimer=setTimeout(()=>estimateDist(lp,dp),500);
+  const key=[lp,dp].sort().join('|');
+  if(DT[key]){
+    document.getElementById('distance').value=DT[key].l;
+    document.getElementById('ballastDist').value=DT[key].b;
+    setDMeta('laden','table');setDMeta('ballast','table');
+    return;
   }
-  refreshBunkers();
-  refreshPortCosts();
-  refreshCanalDues();
+  setDMeta('laden','loading');setDMeta('ballast','loading');
+  clearTimeout(apiTimer);
+  apiTimer=setTimeout(()=>estimateDist(lp,dp),500);
 }
 
 function estimateDist(lp,dp){
   const lPort=PORTS.find(p=>norm(p.n)===norm(lp));
   const dPort=PORTS.find(p=>norm(p.n)===norm(dp));
-  if(!lPort||!dPort){setDMeta('laden','error');setDMeta('ballast','error');setDataNote('routeDataNote','Route data',{error:'enter route manually'});return;}
+  if(!lPort||!dPort){setDMeta('laden','error');setDMeta('ballast','error');return;}
   const lc=RC[lPort.r],dc=RC[dPort.r];
-  if(!lc||!dc){setDMeta('laden','error');setDMeta('ballast','error');setDataNote('routeDataNote','Route data',{error:'enter route manually'});return;}
+  if(!lc||!dc){setDMeta('laden','error');setDMeta('ballast','error');return;}
   const dLat=(dc.lat-lc.lat)*Math.PI/180,dLon=(dc.lon-lc.lon)*Math.PI/180;
   const a=Math.sin(dLat/2)**2+Math.cos(lc.lat*Math.PI/180)*Math.cos(dc.lat*Math.PI/180)*Math.sin(dLon/2)**2;
   const km=6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
@@ -1361,8 +863,6 @@ function estimateDist(lp,dp){
   document.getElementById('distance').value=laden;
   document.getElementById('ballastDist').value=ballast;
   setDMeta('laden','api');setDMeta('ballast','api');
-  const fallback={from:lp,to:dp,distanceNm:laden,ballastDistanceNm:ballast,ecaDistanceNm:g('ecaDist'),suggestedCanal:canal,source:'local_coordinate_fallback',updatedAt:new Date().toISOString(),confidence:'low',status:'estimated',note:'Browser fallback estimate. Verify before fixture decisions.'};
-  setSnapshot('route',fallback);setDataNote('routeDataNote','Route data',fallback);
 }
 
 function setDMeta(type,src){
@@ -1385,68 +885,6 @@ function unlockDist(type){
 
 function onManualDist(){
   setDMeta('laden','manual');setDMeta('ballast','manual');
-}
-
-// ═══════════════════════════════════════
-//  LIVE DATA REFRESH HELPERS
-// ═══════════════════════════════════════
-async function refreshCarbon(){
-  try{
-    const data=await fetchJSON('/api/carbon');
-    sv('euaPrice',data.euaPriceEur);
-    setSnapshot('carbon',data);
-    setDataNote('carbonDataNote','Carbon data',data);
-  }catch(err){
-    console.error('Carbon fetch failed',err);
-    const fallback={error:'using manual EUA input',source:'manual_input',updatedAt:new Date().toISOString(),confidence:'manual',status:'manual'};
-    setSnapshot('carbon',fallback);setDataNote('carbonDataNote','Carbon data',fallback);
-  }
-}
-
-async function refreshPortCosts(){
-  const vt=gs('vesselType')||'supramax';
-  const load=gs('loadPort'),disch=gs('dischPort');
-  // Fetch both ports in parallel — independent failures handled separately.
-  const safeGet=url=>fetchJSON(url).catch(e=>({_error:e.message}));
-  const [loadData,dischData]=await Promise.all([
-    load?safeGet(`/api/port-costs?port=${encodeURIComponent(load)}&vesselType=${encodeURIComponent(vt)}`):Promise.resolve(null),
-    disch?safeGet(`/api/port-costs?port=${encodeURIComponent(disch)}&vesselType=${encodeURIComponent(vt)}`):Promise.resolve(null)
-  ]);
-  const notes=[];
-  if(loadData&&!loadData._error){sv('daLoad',loadData.daMid);setSnapshot('loadPortCosts',loadData);notes.push(`${load}: ${formatRange(loadData.daLow,loadData.daMid,loadData.daHigh)}`);}
-  else if(loadData&&loadData._error){console.error('Load port DA fetch failed',loadData._error);}
-  if(dischData&&!dischData._error){sv('daDisch',dischData.daMid);setSnapshot('dischargePortCosts',dischData);notes.push(`${disch}: ${formatRange(dischData.daLow,dischData.daMid,dischData.daHigh)}`);}
-  else if(dischData&&dischData._error){console.error('Discharge port DA fetch failed',dischData._error);}
-  if(notes.length){
-    const combined={source:'mock_port_da_model',updatedAt:new Date().toISOString(),confidence:'low',status:'estimated',note:notes.join(' · ')};
-    setDataNote('portCostDataNote','Port cost data',combined);
-    document.getElementById('portCostDataNote').innerHTML+=`<br>${notes.join('<br>')}`;
-  }else{
-    const fallback={error:'using manual DA inputs',source:'manual_input',updatedAt:new Date().toISOString(),confidence:'manual',status:'manual'};
-    setDataNote('portCostDataNote','Port cost data',fallback);
-  }
-}
-
-async function refreshCanalDues(){
-  try{
-    const data=await fetchJSON(`/api/canal-dues?canal=${encodeURIComponent(gs('canal')||'none')}&vesselType=${encodeURIComponent(gs('vesselType')||'supramax')}`);
-    setSnapshot('canal',data);
-    setDataNote('canalDataNote','Canal data',data);
-    if(data.rangeHigh>0){
-      document.getElementById('canalDataNote').innerHTML+=`<br>Estimated range: ${formatRange(data.rangeLow,data.estimatedDues,data.rangeHigh)} — actual dues must be verified.`;
-    }
-  }catch(err){
-    console.error('Canal dues fetch failed',err);
-    const fallback={error:'using static canal dues',source:'static_default',updatedAt:new Date().toISOString(),confidence:'low',status:'estimated'};
-    setSnapshot('canal',fallback);setDataNote('canalDataNote','Canal data',fallback);
-  }
-}
-
-async function initLiveData(){
-  // refreshCarbon is the only call not triggered by doLookup — run it in parallel.
-  // doLookup handles bunkers, portCosts, and canalDues so we don't double-fire those.
-  refreshCarbon();
-  doLookup();
 }
 
 // ═══════════════════════════════════════
@@ -1538,7 +976,7 @@ function calculate(){
   const bVlsfo=vlsfoSea*vlsfo,bMgo=(mgoSea+portBunker)*mgo,bTotal=bVlsfo+bMgo;
 
   // Revenue
-  const canalCost=(liveDataSnapshot.canal && typeof liveDataSnapshot.canal.estimatedDues==='number')?liveDataSnapshot.canal.estimatedDues:(CANAL_COST[canal]||0);
+  const canalCost=CANAL_COST[canal]||0;
   const grossFrt=qty*rate;
   const adcommAmt=grossFrt*adcomm,brokAmt=grossFrt*brok;
   const netFrt=grossFrt-adcommAmt-brokAmt;
@@ -1549,7 +987,7 @@ function calculate(){
   const shipCost=shipPPD*daysTotal;
 
   // EU ETS
-  const co2=seaCons*3.114; // fuel MT × 3.114 = tonnes CO₂; do not divide by 1,000
+  const co2=seaCons*2.9/1000;
   const euaFac=euaRegion==='none'?0:euaRegion==='half'?0.5:1.0;
   const euaCost=co2*euaPrice*euaFac*1.08;
 
@@ -1570,7 +1008,7 @@ function calculate(){
   return{speed,speedAdj,consLaden,consBallast,daysL,daysB,daysPort,wxBuf,daysTotal,
     vlsfoSea,mgoSea,portBunker,bVlsfo,bMgo,bTotal,canalCost,daL,daD,insAmt,euaCost,
     grossFrt,adcommAmt,brokAmt,netFrt,shipPPD,shipCost,totalVoyage,totalCost,result,
-    tce,mktTce,qty,rate,co2,euaFac,vt,canal,seaCons,dataSnapshot:cloneSnapshot()};
+    tce,mktTce,qty,rate,co2,euaFac,vt,canal,seaCons};
 }
 
 // ═══════════════════════════════════════
@@ -1637,17 +1075,6 @@ function renderResults(r,area,warnings){
       <div style="font-family:var(--mono);font-size:10px;color:var(--text2);min-width:70px;text-align:right">${fmt(c.val)}</div>
     </div>`).join('');
 
-  const snap=r.dataSnapshot||{};
-  const sourceRow=(label,d)=>`<div class="rrow"><span class="rl">${label}</span><span class="rv" style="font-size:10px;text-align:right">${d?`${d.status||'n/a'} · ${d.source||'n/a'} · ${shortTime(d.updatedAt)}`:'manual/static'}</span></div>`;
-  const sourceHtml=[
-    sourceRow('Bunkers',snap.bunkers),
-    sourceRow('Route distance',snap.route),
-    sourceRow('Carbon price',snap.carbon),
-    sourceRow('Load port DA',snap.portCosts&&snap.portCosts.load),
-    sourceRow('Discharge port DA',snap.portCosts&&snap.portCosts.discharge),
-    sourceRow('Canal dues',snap.canal)
-  ].join('');
-
   area.innerHTML=`
 ${warnHtml}${alertHtml}
 <div class="rhero">
@@ -1659,7 +1086,7 @@ ${warnHtml}${alertHtml}
   <div class="met">
     <div class="mlabel">TCE</div>
     <div class="mval" style="color:${r.tce>=r.mktTce?'var(--green2)':'var(--red2)'}">${fmt(r.tce)}/d</div>
-    <div class="msub">Market ref: ${fmt(r.mktTce)}/d <span style="color:var(--text4);font-size:8px">(indicative)</span></div>
+    <div class="msub">Market: ${fmt(r.mktTce)}/d</div>
   </div>
   <div class="met">
     <div class="mlabel">Net freight</div>
@@ -1706,10 +1133,6 @@ ${warnHtml}${alertHtml}
   <div class="ctitle">Cost breakdown</div>
   ${waterfallHtml}
 </div>
-<div class="card">
-  <div class="ctitle">Data snapshot</div>
-  ${sourceHtml}
-</div>
 <div class="card" style="border-color:${pos?'rgba(29,184,116,0.3)':'rgba(201,64,64,0.3)'}">
   <div class="rrow sub ${pos?'rpos2':'rneg2'}"><span class="rl">VOYAGE RESULT</span><span class="rv" style="font-size:16px">${fmt(r.result)}</span></div>
 </div>
@@ -1736,7 +1159,6 @@ function setCharter(mode,btn){
 function onVesselChange(){
   const d=VD[gs('vesselType')];
   sv('speed',d.speed);sv('consLaden',d.laden);sv('consBallast',d.ballast);sv('consPort',d.port);
-  refreshPortCosts();refreshCanalDues();
 }
 
 // ═══════════════════════════════════════
@@ -1756,7 +1178,7 @@ function resetForm(){
   sv('opex',6500);sv('cargoIns',0.025);sv('tcHire',14000);sv('cargoIns2',0.025);
   sv('euaPrice',65);sv('euaRegion','none');
   setDMeta('laden','table');setDMeta('ballast','table');
-  doLookup();refreshCarbon();
+  doLookup();
   document.getElementById('resultsArea').innerHTML=`<div class="empty"><div class="empty-icon">◈</div><p>Fill in your voyage details on the left,<br>then press <strong style="color:var(--gold3)">Run Estimate</strong> to calculate.</p></div>`;
 }
 
@@ -1764,8 +1186,6 @@ function resetForm(){
 //  SAVE & HISTORY
 // ═══════════════════════════════════════
 function saveEstimateFromInputs(){
-  const warnings=validate();
-  if(warnings.some(w=>w.level==='error')){calc();alert('Fix validation errors before logging this voyage.');return;}
   const r=calculate();
   if(!r){alert('Please fill in voyage details before logging.');return;}
   // Also show results if not already shown
@@ -1779,12 +1199,10 @@ function saveEstimateFromInputs(){
     type:gs('vesselType'),cargo:gs('cargoType'),
     qty:g('cargoQty'),rate:g('freightRate'),
     result:r.result,tce:r.tce,days:r.daysTotal,charter:charterMode,
-    speed:r.speed,bTotal:r.bTotal,netFrt:r.netFrt,totalCost:r.totalCost,
-    dataSnapshot:r.dataSnapshot
+    speed:r.speed,bTotal:r.bTotal,netFrt:r.netFrt,totalCost:r.totalCost
   };
   savedHistory.unshift(entry);
   try{localStorage.setItem('pa_history',JSON.stringify(savedHistory.slice(0,100)));}catch(e){}
-  saveEstimateToDb(entry); // async — non-blocking, fires and forgets
   renderHistory();
   const btn=document.getElementById('logBtn');
   btn.textContent='Logged ✓';btn.style.borderColor='var(--green)';btn.style.color='var(--green)';
@@ -1824,23 +1242,8 @@ function renderHistory(){
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-top:10px">
           ${[['Net freight',fmt(e.netFrt)],['Bunkers','−'+fmt(e.bTotal)],['Total costs','−'+fmt(e.totalCost)],['Speed',fmtD(e.speed||13,1)+' kn']].map(([l,v])=>`<div class="met"><div class="mlabel">${l}</div><div style="font-family:var(--mono);font-size:13px;color:var(--text)">${v}</div></div>`).join('')}
         </div>
-        ${renderHistorySnapshot(e.dataSnapshot)}
       </div>
     </div>`).join('');
-}
-
-
-function renderHistorySnapshot(snap){
-  if(!snap)return '';
-  const sourceLine=(label,d)=>`<div class="rrow"><span class="rl">${label}</span><span class="rv" style="font-size:10px;text-align:right">${d?`${d.status||'n/a'} · ${d.source||'n/a'} · ${shortTime(d.updatedAt)}`:'manual/static'}</span></div>`;
-  return `<div style="margin-top:10px"><div class="ctitle" style="margin-bottom:6px"><span class="cnum">DATA</span> Snapshot used</div>
-    ${sourceLine('Bunkers',snap.bunkers)}
-    ${sourceLine('Route distance',snap.route)}
-    ${sourceLine('Carbon price',snap.carbon)}
-    ${sourceLine('Load port DA',snap.portCosts&&snap.portCosts.load)}
-    ${sourceLine('Discharge port DA',snap.portCosts&&snap.portCosts.discharge)}
-    ${sourceLine('Canal dues',snap.canal)}
-  </div>`;
 }
 
 function toggleHistory(id){
@@ -1848,15 +1251,10 @@ function toggleHistory(id){
   el.classList.toggle('open');
 }
 
-async function clearHistory(){
+function clearHistory(){
   if(!confirm('Clear all saved estimates?'))return;
   savedHistory=[];
   try{localStorage.removeItem('pa_history');}catch(e){}
-  if(sb&&currentUser){
-    // Delete all user's estimates from DB
-    const{error}=await sb.from('estimates').delete().eq('user_id',currentUser.id);
-    if(error)console.error('Clear estimates from DB failed:',error.message);
-  }
   renderHistory();
 }
 
@@ -1864,8 +1262,6 @@ async function clearHistory(){
 //  SCENARIOS
 // ═══════════════════════════════════════
 function saveScenario(){
-  const warnings=validate();
-  if(warnings.some(w=>w.level==='error')){calc();alert('Fix validation errors before saving a scenario.');return;}
   const r=calculate();if(!r)return;
   if(scenarios.length>=3)scenarios.pop();
   const label=`Scenario ${scenarios.length+1}`;
@@ -1911,8 +1307,6 @@ function removeScenario(id){scenarios=scenarios.filter(s=>s.id!==id);scenarios.f
 //  PDF EXPORT
 // ═══════════════════════════════════════
 function exportPDF(){
-  const warnings=validate();
-  if(warnings.some(w=>w.level==='error')){calc();alert('Fix validation errors before exporting this estimate.');return;}
   const r=calculate();
   if(!r){alert('Please complete the voyage estimate first.');return;}
   try{
@@ -1994,17 +1388,6 @@ function exportPDF(){
     row('Weather buffer',`${fmtD(r.wxBuf)} d`);
     row('Total voyage days',`${fmtD(r.daysTotal)} d`,true);y+=3;
 
-    section('DATA SNAPSHOT');
-    const snap=r.dataSnapshot||{};
-    const sourceLine=(label,d)=>row(label,d?`${d.status||'n/a'} · ${d.source||'n/a'} · ${shortTime(d.updatedAt)}`:'manual/static');
-    sourceLine('Bunkers',snap.bunkers);
-    sourceLine('Route distance',snap.route);
-    sourceLine('Carbon price',snap.carbon);
-    sourceLine('Load port DA',snap.portCosts&&snap.portCosts.load);
-    sourceLine('Discharge port DA',snap.portCosts&&snap.portCosts.discharge);
-    sourceLine('Canal dues',snap.canal);
-    y+=3;
-
     hline([30,50,80]);
     doc.setFontSize(13);doc.setFont('helvetica','bold');
     doc.setTextColor(...rcolor);
@@ -2032,16 +1415,14 @@ function showPanel(name,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
-  else document.querySelectorAll('.nav-btn')[{estimate:0,scenarios:1,fleet:2,history:3}[name]].classList.add('active');
+  else document.querySelectorAll('.nav-btn')[{estimate:0,scenarios:1,history:2}[name]].classList.add('active');
 }
 
 // ═══════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════
 renderHistory();
-renderFleet();
-initLiveData();
-initAuth();
+doLookup();
 </script>
 </body>
 </html>
